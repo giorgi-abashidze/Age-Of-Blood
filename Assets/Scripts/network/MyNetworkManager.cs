@@ -54,7 +54,7 @@ namespace network
         {
             base.OnClientConnect();
             
-            var createCharMessage = new CreateCharacterMessage()
+            var createCharMessage = new CreateCharacterMessage
             {
                 Name = "test"
             };

@@ -187,7 +187,7 @@ MonoBehaviour:
     ModeOverride: 0
     LensShift: {x: 0, y: 0}
     GateFit: 2
-    m_SensorSize: {x: 2.647597, y: 1}
+    m_SensorSize: {x: 1.9219269, y: 1}
   m_Transitions:
     m_BlendHint: 0
     m_InheritPosition: 0
@@ -250,12 +250,12 @@ MonoBehaviour:
   m_BindingMode: 5
   m_SplineCurvature: 0.2
   m_Orbits:
-  - m_Height: 3.599994
-    m_Radius: 1.150003
-  - m_Height: 1.899999
-    m_Radius: 2.099999
+  - m_Height: 6.299995
+    m_Radius: 2.950002
+  - m_Height: 3.699997
+    m_Radius: 4.800001
   - m_Height: 0.4
-    m_Radius: 0.3999961
+    m_Radius: 3.099997
   m_LegacyHeadingBias: 3.4028235e+38
   m_Rigs:
   - {fileID: 1864086527}
@@ -513,7 +513,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BindingMode: 5
-  m_FollowOffset: {x: 0, y: 1.899999, z: -2.099999}
+  m_FollowOffset: {x: 0, y: 3.699997, z: -4.800001}
   m_XDamping: 1
   m_YDamping: 1
   m_ZDamping: 1
@@ -639,7 +639,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BindingMode: 5
-  m_FollowOffset: {x: 0, y: 1.899999, z: -2.099999}
+  m_FollowOffset: {x: 0, y: 3.699997, z: -4.800001}
   m_XDamping: 1
   m_YDamping: 1
   m_ZDamping: 1
@@ -897,7 +897,7 @@ MonoBehaviour:
     ModeOverride: 0
     LensShift: {x: 0, y: 0}
     GateFit: 2
-    m_SensorSize: {x: 2.647597, y: 1}
+    m_SensorSize: {x: 1.9219269, y: 1}
   m_Transitions:
     m_BlendHint: 0
     m_InheritPosition: 0
@@ -974,7 +974,7 @@ MonoBehaviour:
     ModeOverride: 0
     LensShift: {x: 0, y: 0}
     GateFit: 2
-    m_SensorSize: {x: 2.647597, y: 1}
+    m_SensorSize: {x: 1.9219269, y: 1}
   m_Transitions:
     m_BlendHint: 0
     m_InheritPosition: 0
@@ -1071,7 +1071,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BindingMode: 5
-  m_FollowOffset: {x: 0, y: 1.899999, z: -2.099999}
+  m_FollowOffset: {x: 0, y: 3.699997, z: -4.800001}
   m_XDamping: 1
   m_YDamping: 1
   m_ZDamping: 1
@@ -1270,7 +1270,7 @@ MonoBehaviour:
     ModeOverride: 0
     LensShift: {x: 0, y: 0}
     GateFit: 2
-    m_SensorSize: {x: 2.647597, y: 1}
+    m_SensorSize: {x: 1.9219269, y: 1}
   m_Transitions:
     m_BlendHint: 0
     m_InheritPosition: 0

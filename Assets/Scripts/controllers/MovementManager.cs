@@ -83,7 +83,7 @@ namespace controllers
             {
                 if (Physics.Raycast(_mainCam.ScreenPointToRay(Input.mousePosition), out var hit, 100)) {
                     if(hit.transform.CompareTag("Terrain") && _canMove){
-                        NetworkClient.Send(new MoveRequest()
+                        NetworkClient.Send(new MoveRequest
                         {
                             IssuerNetId = netId,
                             CurrentPoint = transform.position,
