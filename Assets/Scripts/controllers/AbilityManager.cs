@@ -16,19 +16,19 @@ namespace controllers
 {
     public class AbilityManager: NetworkBehaviour
     {
-        private SortedDictionary<KeyCode,int> _fPanel = new SortedDictionary<KeyCode,int>();
-        private SortedDictionary<KeyCode,int> _numPanel = new SortedDictionary<KeyCode,int>();
+        private readonly SortedDictionary<KeyCode,ushort> _fPanel = new SortedDictionary<KeyCode,ushort>();
+        private readonly SortedDictionary<KeyCode,ushort> _numPanel = new SortedDictionary<KeyCode,ushort>();
         
-        private SortedDictionary<int,Skill> _allAbilities = new SortedDictionary<int,Skill>();
+        private SortedDictionary<ushort,Skill> _allAbilities = new SortedDictionary<ushort,Skill>();
         
-        private SortedDictionary<int,Skill> _allAbilitiesOnClient = new SortedDictionary<int,Skill>();
-        private SortedDictionary<int,Skill> _classAbilities = new SortedDictionary<int,Skill>();
+        private SortedDictionary<ushort,Skill> _allAbilitiesOnClient = new SortedDictionary<ushort,Skill>();
+        private SortedDictionary<ushort,Skill> _classAbilities = new SortedDictionary<ushort,Skill>();
 
         //int skillId, float remainingTime
-        private Dictionary<int,float> _buffList = new Dictionary<int,float>();
-        private SortedDictionary<int,float> _deBuffList = new SortedDictionary<int,float>();
+        private readonly Dictionary<ushort,float> _buffList = new Dictionary<ushort,float>();
+        private readonly SortedDictionary<ushort,float> _deBuffList = new SortedDictionary<ushort,float>();
         
-        private List<Skill> _cooldownList = new List<Skill>();
+        private readonly List<Skill> _cooldownList = new List<Skill>();
         
         
         //Can do magic skill
@@ -49,7 +49,12 @@ namespace controllers
                 return;
             
             var ability = _allAbilities[request.SkillId];
-
+            
+            var dist = Vector3.Distance(player.transform.position, target.transform.position);
+            
+            if (dist > ability.Range)
+                return;
+            
             if (request.IssuerClassId != ability.ClassId || ability.RequiredLevel > request.IssuerLevel)
                 return;
 
@@ -63,6 +68,21 @@ namespace controllers
             var playerStats = player.GetComponent<StatsManager>();
             var playerAbilityManager = player.GetComponent<AbilityManager>();
 
+            if (ability.ConsumeType != ConsumeType.None)
+            {
+                if (ability.ConsumeType == ConsumeType.Hp && ability.ConsumeValue > playerStats.hp)
+                {
+                    TargetNotifySelf(10);
+                    return;
+                }
+                
+                if (ability.ConsumeType == ConsumeType.Mp && ability.ConsumeValue > playerStats.mp)
+                {
+                    TargetNotifySelf(11);
+                    return;
+                }
+            }
+            
             if (ability.TypeSecondary == SkillSecondaryType.Magic && !ability.IsBasicPAttack && !playerAbilityManager._canDoMSkill)
                 return;
             if (ability.TypeSecondary == SkillSecondaryType.Physical && !ability.IsBasicPAttack && !playerAbilityManager._canDoWSkill)
@@ -567,7 +587,14 @@ namespace controllers
                             }
                         }
 
-                        targetAbilityManager._deBuffList.Add(ability.Id,ability.Time);
+                        if (targetAbilityManager._deBuffList.ContainsKey(ability.Id))
+                        {
+                            targetAbilityManager._deBuffList[ability.Id] = ability.Time;
+                        }
+                        else{
+                            targetAbilityManager._deBuffList.Add(ability.Id,ability.Time);
+                        }
+
                         
                         TargetNotifySelfAbilityEffect(6,ability.Id);
                         
@@ -1098,10 +1125,257 @@ namespace controllers
             
         }
 
+        [Command]
+        void CmdRemoveBuffDebuff(GameObject player,ushort abilityId)
+        {
+            if (!_allAbilities.ContainsKey(abilityId))
+                return;
+            
+            var abilityManager = player.GetComponent<AbilityManager>();
+            var statsManager = player.GetComponent<StatsManager>();
+            var movementManager = player.GetComponent<MovementManager>();
+
+            var ability = _allAbilities[abilityId];
+
+            for (var i = 0; i < ability.AffectTarget.Count; i++)
+            {
+                var at = ability.AffectTarget[i];
+
+                switch (at)
+                {
+                    case SkillAffectTarget.Accuracy:
+                        switch (ability.AffectType[i])
+                        {
+                            case SkillAffectType.Decrease:
+                                statsManager.accuracy += ((ability.Power / 100) * statsManager.accuracy);
+                                break;
+                            case SkillAffectType.Increase:
+                                statsManager.accuracy -= ((ability.Power / 100) * statsManager.accuracy);
+                                break;
+                        }
+                        break;
+                    case SkillAffectTarget.Cp:
+                        switch (ability.AffectType[i])
+                        {
+                            case SkillAffectType.Decrease:
+                                statsManager.maxCp += ((ability.Power / 100) * statsManager.maxCp);
+                                break;
+                            case SkillAffectType.Increase:
+                                statsManager.maxCp -= ((ability.Power / 100) * statsManager.maxCp);
+                                break;
+                        }
+                        break;
+                    case SkillAffectTarget.Hp:
+                        switch (ability.AffectType[i])
+                        {
+                            case SkillAffectType.Decrease:
+                                statsManager.maxHp += ((ability.Power / 100) * statsManager.maxHp);
+                                break;
+                            case SkillAffectType.Increase:
+                                statsManager.maxHp -= ((ability.Power / 100) * statsManager.maxHp);
+                                break;
+                            case SkillAffectType.Block:
+                                abilityManager._canBeHealed = true;
+                                break;
+                        }
+                        break;
+                    case SkillAffectTarget.Evasion:
+                        switch (ability.AffectType[i])
+                        {
+                            case SkillAffectType.Decrease:
+                                statsManager.evasion += ((ability.Power / 100) * statsManager.evasion);
+                                break;
+                            case SkillAffectType.Increase:
+                                statsManager.evasion -= ((ability.Power / 100) * statsManager.evasion);
+                                break;
+                        }
+                        break;
+                    case SkillAffectTarget.Mp:
+                        switch (ability.AffectType[i])
+                        {
+                            case SkillAffectType.Decrease:
+                                statsManager.maxMp += ((ability.Power / 100) * statsManager.maxMp);
+                                break;
+                            case SkillAffectType.Increase:
+                                statsManager.maxMp -= ((ability.Power / 100) * statsManager.maxMp);
+                                break;
+                        }
+                        break;
+                    case SkillAffectTarget.Speed:
+                        switch (ability.AffectType[i])
+                        {
+                            case SkillAffectType.Decrease:
+                                statsManager.speed += ((ability.Power / 100) * statsManager.speed);
+                                break;
+                            case SkillAffectType.Increase:
+                                statsManager.speed -= ((ability.Power / 100) * statsManager.speed);
+                                break;
+                        }
+                        break;
+                    case SkillAffectTarget.AbilityMove:
+                        switch (ability.AffectType[i])
+                        {
+                            case SkillAffectType.Block:
+                                movementManager._canMove = true;
+                                break;
+                        }
+                        break;
+                    case SkillAffectTarget.AtkSpeed:
+                        switch (ability.AffectType[i])
+                        {
+                            case SkillAffectType.Decrease:
+                                statsManager.atkSpeed += ((ability.Power / 100) * statsManager.atkSpeed);
+                                break;
+                            case SkillAffectType.Increase:
+                                statsManager.atkSpeed -= ((ability.Power / 100) * statsManager.atkSpeed);
+                                break;
+                        }
+                        break;
+                    case SkillAffectTarget.CastSpeed:
+                        switch (ability.AffectType[i])
+                        {
+                            case SkillAffectType.Decrease:
+                                statsManager.castSpeed += ((ability.Power / 100) * statsManager.castSpeed);
+                                break;
+                            case SkillAffectType.Increase:
+                                statsManager.castSpeed -= ((ability.Power / 100) * statsManager.castSpeed);
+                                break;
+                        }
+                        break;
+                    case SkillAffectTarget.CritPower:
+                        switch (ability.AffectType[i])
+                        {
+                            case SkillAffectType.Decrease:
+                                statsManager.critPower += ((ability.Power / 100) * statsManager.critPower);
+                                break;
+                            case SkillAffectType.Increase:
+                                statsManager.critPower -= ((ability.Power / 100) * statsManager.critPower);
+                                break;
+                        }
+                        break;
+                    case SkillAffectTarget.CritRate:
+                        switch (ability.AffectType[i])
+                        {
+                            case SkillAffectType.Decrease:
+                                statsManager.critRate += ((ability.Power / 100) * statsManager.critRate);
+                                break;
+                            case SkillAffectType.Increase:
+                                statsManager.critRate -= ((ability.Power / 100) * statsManager.critRate);
+                                break;
+                        }
+                        break;
+                    case SkillAffectTarget.MAtk:
+                        switch (ability.AffectType[i])
+                        {
+                            case SkillAffectType.Decrease:
+                                statsManager.mAtk += ((ability.Power / 100) * statsManager.mAtk);
+                                break;
+                            case SkillAffectType.Increase:
+                                statsManager.mAtk -= ((ability.Power / 100) * statsManager.mAtk);
+                                break;
+                        }
+                        break;
+                    case SkillAffectTarget.MDef:
+                        switch (ability.AffectType[i])
+                        {
+                            case SkillAffectType.Decrease:
+                                statsManager.mDef += ((ability.Power / 100) * statsManager.mDef);
+                                break;
+                            case SkillAffectType.Increase:
+                                statsManager.mDef -= ((ability.Power / 100) * statsManager.mDef);
+                                break;
+                        }
+                        break;
+                    case SkillAffectTarget.PAtk:
+                        switch (ability.AffectType[i])
+                        {
+                            case SkillAffectType.Decrease:
+                                statsManager.pAtk += ((ability.Power / 100) * statsManager.pAtk);
+                                break;
+                            case SkillAffectType.Increase:
+                                statsManager.pAtk -= ((ability.Power / 100) * statsManager.pAtk);
+                                break;
+                        }
+                        break;
+                    case SkillAffectTarget.PDef:
+                        switch (ability.AffectType[i])
+                        {
+                            case SkillAffectType.Decrease:
+                                statsManager.pDef += ((ability.Power / 100) * statsManager.pDef);
+                                break;
+                            case SkillAffectType.Increase:
+                                statsManager.pDef -= ((ability.Power / 100) * statsManager.pDef);
+                                break;
+                        }
+                        break;
+                    case SkillAffectTarget.AbilitySkillMagic:
+                        switch (ability.AffectType[i])
+                        {
+                            case SkillAffectType.Block:
+                                abilityManager._canDoMSkill = true;
+                                break;
+                        }
+                        break;
+                    case SkillAffectTarget.AbilitySkillPhysical:
+                        switch (ability.AffectType[i])
+                        {
+                            case SkillAffectType.Block:
+                                abilityManager._canDoWSkill = true;
+                                break;
+                        }
+                        break;
+                    case SkillAffectTarget.MCritPower:
+                        switch (ability.AffectType[i])
+                        {
+                            case SkillAffectType.Decrease:
+                                statsManager.mCritPower += ((ability.Power / 100) * statsManager.mCritPower);
+                                break;
+                            case SkillAffectType.Increase:
+                                statsManager.mCritPower -= ((ability.Power / 100) * statsManager.mCritPower);
+                                break;
+                        }
+                        break;
+                    case SkillAffectTarget.MCritRate:
+                        switch (ability.AffectType[i])
+                        {
+                            case SkillAffectType.Decrease:
+                                statsManager.mCritRate += ((ability.Power / 100) * statsManager.mCritRate);
+                                break;
+                            case SkillAffectType.Increase:
+                                statsManager.mCritRate -= ((ability.Power / 100) * statsManager.mCritRate);
+                                break;
+                        }
+                        break;
+                }
+            }
+
+            if (ability.Type == SkillType.Buff)
+            {
+                if(abilityManager._buffList.ContainsKey(abilityId))
+                    abilityManager._buffList.Remove(abilityId);
+            }
+            else if (ability.Type == SkillType.DeBuff)
+            {
+                if(abilityManager._deBuffList.ContainsKey(abilityId))
+                    abilityManager._deBuffList.Remove(abilityId);
+            }
+
+            
+            TargetEffectRemoved(9,abilityId);
+        }
+
         [TargetRpc]
-        void TargetPutInCooldown(int skillId)
+        void TargetEffectRemoved(int msgId,ushort skillId)
+        {
+            Debug.Log((NotificationMessages.AbilityNotifications[msgId],_allAbilitiesOnClient[skillId].Name),this);
+        }
+
+        [TargetRpc]
+        void TargetPutInCooldown(ushort skillId)
         {
             var skill = _classAbilities[skillId];
+            if (skill.MaxReloadTime == 0)
+                return;
             skill.StartReload();
             _cooldownList.Add(skill);
         }
@@ -1116,6 +1390,12 @@ namespace controllers
         void TargetNotifySelfAbilityEffect(int msgId,ushort abilityId)
         {
             Debug.Log((NotificationMessages.AbilityNotifications[msgId],_allAbilitiesOnClient[abilityId].Name),this);
+        }
+        
+        [TargetRpc]
+        void TargetNotifySelf(int msgId)
+        {
+            Debug.Log(NotificationMessages.AbilityNotifications[msgId],this);
         }
 
         [TargetRpc]
@@ -1137,21 +1417,7 @@ namespace controllers
         [Client]
         private void LoadSkillPanelConfig()
         {
-            var fSkillsDataExists = File.Exists(Application.persistentDataPath + "/FPanelData.json");
-
-            if (fSkillsDataExists)
-            {
-                var data = File.ReadAllText(Application.persistentDataPath + "/FPanelData.json");
-                _fPanel = JsonUtility.FromJson<SortedDictionary<KeyCode,int>>(data);
-            }
-
-            var numSkillsDataExists = File.Exists(Application.persistentDataPath + "/NumPanelData.json");
-
-            if (numSkillsDataExists)
-            {
-                var data = File.ReadAllText(Application.persistentDataPath + "/NumPanelData.json");
-                _numPanel = JsonUtility.FromJson<SortedDictionary<KeyCode,int>>(data);
-            }
+           
             
         }
         
@@ -1198,13 +1464,13 @@ namespace controllers
             foreach(var pair in _buffList.ToArray()) {
                 _buffList[pair.Key] -= Time.deltaTime;
                 if (_buffList[pair.Key] <= 0)
-                    _buffList.Remove(pair.Key);
+                    CmdRemoveBuffDebuff(gameObject,pair.Key);
             }
             
             foreach(var pair in _deBuffList.ToArray()) {
                 _deBuffList[pair.Key] -= Time.deltaTime;
                 if (_deBuffList[pair.Key] <= 0)
-                    _deBuffList.Remove(pair.Key);
+                    CmdRemoveBuffDebuff(gameObject,pair.Key);
             }
             
         }
@@ -1212,7 +1478,6 @@ namespace controllers
         [Client]
         public void UseAbilityFromFPanel(KeyCode key)
         {
-
             
             if (_fPanel.ContainsKey(key))
             {
@@ -1222,7 +1487,31 @@ namespace controllers
                 { 
                     if(skill.TargetType == SkillTargetType.Target && _target == null)
                         return;
-                    
+
+                    if (skill.ConsumeType != ConsumeType.None)
+                    {
+                        if (skill.ConsumeType == ConsumeType.Hp && _statsManager.hp < skill.ConsumeValue)
+                        {
+                            Debug.Log(NotificationMessages.AbilityNotifications[10]);
+                            return;
+                        }
+
+
+                        if (skill.ConsumeType == ConsumeType.Mp && _statsManager.mp < skill.ConsumeValue)
+                        {
+                            Debug.Log(NotificationMessages.AbilityNotifications[11]);
+                            return;
+                        }
+
+                    }
+
+                    if (skill.TargetType == SkillTargetType.Target)
+                    {
+                        var dist = Vector3.Distance(gameObject.transform.position, _target.transform.position);
+                        if (dist > skill.Range)
+                            return;
+                    }
+
                     if (!skill.Reloading && skill.Type != SkillType.Passive)
                     {
                         CmdRequestAbilityUse(gameObject,_target,new AbilityUseRequest
@@ -1252,6 +1541,30 @@ namespace controllers
                 {
                     if (skill.TargetType == SkillTargetType.Target && _target == null)
                         return;
+                    
+                    if (skill.ConsumeType != ConsumeType.None)
+                    {
+                        if (skill.ConsumeType == ConsumeType.Hp && _statsManager.hp < skill.ConsumeValue)
+                        {
+                            Debug.Log(NotificationMessages.AbilityNotifications[10]);
+                            return;
+                        }
+
+
+                        if (skill.ConsumeType == ConsumeType.Mp && _statsManager.mp < skill.ConsumeValue)
+                        {
+                            Debug.Log(NotificationMessages.AbilityNotifications[11]);
+                            return;
+                        }
+
+                    }
+                    
+                    if (skill.TargetType == SkillTargetType.Target)
+                    {
+                        var dist = Vector3.Distance(gameObject.transform.position, _target.transform.position);
+                        if (dist > skill.Range)
+                            return;
+                    }
                     
                     if (!skill.Reloading && skill.Type != SkillType.Passive)
                     {

@@ -15,16 +15,14 @@ namespace network
         private const string SpawnableDir = "Prefabs/";
         private readonly List<GameObject> _spawnList = new List<GameObject>();
         
-        private SortedDictionary<int,Skill> _allAbilities = new SortedDictionary<int,Skill>();
         public bool isServer;
 
         public override void Start()
         {
             base.Start();
+
             
-            _spawnList.AddRange(Resources.LoadAll<GameObject>(SpawnableDir));
-                        
-            playerPrefab = _spawnList[0];
+            playerPrefab = Resources.LoadAll<GameObject>(SpawnableDir)[0];
             maxConnections = 500;
             
             if (!isServer)
@@ -66,41 +64,12 @@ namespace network
         {
             
             base.OnStartServer();
-            Debug.Log(">>>>>>>>> Loading classes... <<<<<<<<<<",this);
-            LoadClasses();
-            Debug.Log(">>>>>>>>> Loading skills... <<<<<<<<<<",this);
-            LoadSkills();
-            Debug.Log(">>>>>>>>> "+_allAbilities.Count+" skills Loaded <<<<<<<<<<",this);
+
             
             NetworkServer.RegisterHandler<CreateCharacterMessage>(OnCreateCharacter);
         }
         
-        //todo:nothing inside yet 
-        [Server]
-        private void LoadClasses()
-        {
-            List<Skill> abilities = new List<Skill>();
-            
-            for (var i = 0; i < abilities.Count; i++)
-            {
-                var item = abilities.ElementAt(i);
-                _allAbilities.Add(item.Id,item);
-            }
-        }
         
-        //todo:nothing inside yet 
-        [Server]
-        private void LoadSkills()
-        {
-            List<Skill> abilities = new List<Skill>();
-            
-            for (var i = 0; i < abilities.Count; i++)
-            {
-                var item = abilities.ElementAt(i);
-                _allAbilities.Add(item.Id,item);
-            }
-        }
-   
         
         [ServerCallback]
         private void OnCreateCharacter(NetworkConnection conn,CreateCharacterMessage msg)
@@ -110,12 +79,6 @@ namespace network
             NetworkServer.AddPlayerForConnection(conn, player);
         }
 
-        //todo:nothing inside yet 
-        [Server]
-        private int CalculateSkillDamage(Skill skill)
-        {
-            return 0;
-        }
         
     }
 }

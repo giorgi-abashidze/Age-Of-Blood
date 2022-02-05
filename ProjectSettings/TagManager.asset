@@ -6,6 +6,7 @@ TagManager:
   tags:
   - freelookcam
   - Terrain
+  - NetworkManager
   layers:
   - Default
   - TransparentFX

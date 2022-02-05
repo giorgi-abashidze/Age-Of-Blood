@@ -19,6 +19,11 @@ namespace controllers
         [Command]
         void CmdRequestMove(MoveRequest request)
         {
+            var dist = Vector3.Distance(request.CurrentPoint, request.TargetPoint);
+
+            if (dist > Constants.MoveRange)
+                return;
+            
             OnMoveRequest(request);
         }
 
@@ -49,7 +54,7 @@ namespace controllers
         
         public void StopAgent()
         {
-            _agent.velocity = Vector3.zero;
+            _agent.velocity /=  2;
             _agent.ResetPath();
         }
 
@@ -60,7 +65,7 @@ namespace controllers
                 return;
             
             print("moving to point: "+point);
-            _agent.velocity = Vector3.zero;
+            _agent.velocity /=  2;
             _agent.ResetPath();
             _agent.destination = point;
         }

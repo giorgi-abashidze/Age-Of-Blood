@@ -14,7 +14,10 @@ namespace helpers
             {5,"You use {0}"},
             {6,"{0} Suceeded."},
             {7,"{0} Failed."},
-            {8,"Missed."}
+            {8,"Missed."},
+            {9,"Effect {0} Removed."},
+            {10,"Not enough HP."},
+            {11,"Not enough MP."},
         };
     }
 }

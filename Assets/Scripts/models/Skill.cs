@@ -20,6 +20,9 @@ namespace models
         //time in seconds (if its a buff)
         public float Time {get;set;}
         
+        public ConsumeType ConsumeType { get; set; }
+        
+        public int ConsumeValue { get; set; }
         public SkillType Type {get;set;}
 
         public SkillSecondaryType TypeSecondary {get;set;}

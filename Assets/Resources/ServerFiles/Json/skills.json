@@ -8,6 +8,7 @@
             "ClassId":-1,
             "ClassTypeId":-1,
             "Level":1,
+            "ConsumeType": 2,
             "Type":0,
             "TypeSecondary":0,
             "AffectTarget":[
@@ -31,6 +32,8 @@
             "ClassId":-1,
             "ClassTypeId":2,
             "Level":1,
+            "ConsumeType": 0,
+            "ConsumeValue": 10,
             "Type":0,
             "TypeSecondary":1,
             "AffectTarget":[
@@ -54,6 +57,8 @@
             "ClassId":-1,
             "ClassTypeId":2,
             "Level":2,
+            "ConsumeType": 0,
+            "ConsumeValue": 15,
             "Type":0,
             "TypeSecondary":1,
             "AffectTarget":[
@@ -77,6 +82,8 @@
             "ClassId":-1,
             "ClassTypeId":2,
             "Level":3,
+            "ConsumeType": 0,
+            "ConsumeValue": 20,
             "Type":0,
             "TypeSecondary":1,
             "AffectTarget":[
@@ -100,6 +107,8 @@
             "ClassId":-1,
             "ClassTypeId":2,
             "Level":4,
+            "ConsumeType": 0,
+            "ConsumeValue": 30,
             "Type":0,
             "TypeSecondary":1,
             "AffectTarget":[
