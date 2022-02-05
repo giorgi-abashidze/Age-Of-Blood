@@ -63,9 +63,9 @@ namespace controllers
             var playerStats = player.GetComponent<StatsManager>();
             var playerAbilityManager = player.GetComponent<AbilityManager>();
 
-            if (ability.TypeSecondary == SkillSecondaryType.Magic && !ability.isBasicPAttack && !playerAbilityManager._canDoMSkill)
+            if (ability.TypeSecondary == SkillSecondaryType.Magic && !ability.IsBasicPAttack && !playerAbilityManager._canDoMSkill)
                 return;
-            if (ability.TypeSecondary == SkillSecondaryType.Physical && !ability.isBasicPAttack && !playerAbilityManager._canDoWSkill)
+            if (ability.TypeSecondary == SkillSecondaryType.Physical && !ability.IsBasicPAttack && !playerAbilityManager._canDoWSkill)
                 return;
             
             //self target
@@ -829,7 +829,7 @@ namespace controllers
                                             
                                             damage = playerStats.pAtk + ability.Power - targetStats.pDef;
 
-                                            if (ability.canDoCrit)
+                                            if (ability.CanDoCrit)
                                             {
                                                 critChance = playerStats.critRate / 4;
                                                 int rand =  Random.Range(0,100);
@@ -862,7 +862,7 @@ namespace controllers
                                             //magic skills cant be missed
                                             damage = playerStats.mAtk + ability.Power - targetStats.mDef;
                                             
-                                            if (ability.canDoCrit)
+                                            if (ability.CanDoCrit)
                                             {
                                                 critChance = playerStats.mCritRate / 4;
                                                 int rand = Random.Range(0, 100);
@@ -944,7 +944,7 @@ namespace controllers
                                             
                                             damage = playerStats.pAtk + ability.Power - targetStats.pDef;
 
-                                            if (ability.canDoCrit)
+                                            if (ability.CanDoCrit)
                                             {
                                                 critChance = playerStats.critRate / 4;
                                                 int rand =  Random.Range(0, 100);
@@ -985,7 +985,7 @@ namespace controllers
                                             //magic skills cant be missed
                                             damage = playerStats.mAtk + ability.Power - targetStats.mDef;
                                             
-                                            if (ability.canDoCrit)
+                                            if (ability.CanDoCrit)
                                             {
                                                 critChance = playerStats.mCritRate / 4;
                                                 int rand = Random.Range(0, 100);
@@ -1026,7 +1026,7 @@ namespace controllers
                                          //magic skills cant be missed
                                             damage = playerStats.mAtk + ability.Power - targetStats.mDef;
                                             
-                                            if (ability.canDoCrit)
+                                            if (ability.CanDoCrit)
                                             {
                                                 critChance = playerStats.mCritRate / 4;
                                                 int rand = Random.Range(0, 100);

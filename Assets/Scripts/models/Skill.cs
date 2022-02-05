@@ -9,11 +9,12 @@ namespace models
     public class Skill{
 
         public ushort Id {get;set;}
-        
-        public bool isBasicPAttack { get; set; }
+        public bool IsBasicPAttack { get; set; }
         public string Name {get;set;}
         public byte RequiredLevel { get; set; }
         public byte ClassId { get; set; }
+        
+        public byte ClassTypeId { get; set; }
         public byte Level {get;set;}
         
         //time in seconds (if its a buff)
@@ -31,9 +32,7 @@ namespace models
 
         public int Power {get;set;}
         
-        public int Chance {get;set;}
-        
-        public bool canDoCrit { get; set; }
+        public bool CanDoCrit { get; set; }
         
         //used as affect radius if skill is massive and dont need target
         //else as minimum range
@@ -43,6 +42,8 @@ namespace models
         
         public float ReloadValue { get; set; }
         public bool Reloading { get; set; }
+        
+        public String Description { get; set; }
 
         public void StartReload()
         {

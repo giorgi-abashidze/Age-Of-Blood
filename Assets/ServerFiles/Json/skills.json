@@ -1,0 +1,120 @@
+{
+    "Skills":[
+        {
+            "Id":1,
+            "Name":"Attack",
+            "IsBasicPAttack":true,
+            "RequiredLevel":1,
+            "ClassId":-1,
+            "ClassTypeId":-1,
+            "Level":1,
+            "Type":0,
+            "TypeSecondary":0,
+            "AffectTarget":[
+                2
+            ],
+            "AffectType":[
+                1
+            ],
+            "TargetType":1,
+            "Power":10,
+            "CanDoCrit":true,
+            "Range":4,
+            "MaxReloadTime":0,
+            "Description":"Basic physical attack"
+        },
+        {
+            "Id":2,
+            "Name":"Wind Strike",
+            "IsBasicPAttack":false,
+            "RequiredLevel":1,
+            "ClassId":-1,
+            "ClassTypeId":2,
+            "Level":1,
+            "Type":0,
+            "TypeSecondary":1,
+            "AffectTarget":[
+                2
+            ],
+            "AffectType":[
+                1
+            ],
+            "TargetType":1,
+            "Power":10,
+            "CanDoCrit":true,
+            "Range":30,
+            "MaxReloadTime":3,
+            "Description":"Wind magic attack. Power 10"
+        },
+        {
+            "Id":3,
+            "Name":"Wind Strike",
+            "IsBasicPAttack":false,
+            "RequiredLevel":5,
+            "ClassId":-1,
+            "ClassTypeId":2,
+            "Level":2,
+            "Type":0,
+            "TypeSecondary":1,
+            "AffectTarget":[
+                2
+            ],
+            "AffectType":[
+                1
+            ],
+            "TargetType":1,
+            "Power":20,
+            "CanDoCrit":true,
+            "Range":30,
+            "MaxReloadTime":3,
+            "Description":"Wind magic attack. Power 20"
+        },
+        {
+            "Id":4,
+            "Name":"Wind Strike",
+            "IsBasicPAttack":false,
+            "RequiredLevel":10,
+            "ClassId":-1,
+            "ClassTypeId":2,
+            "Level":3,
+            "Type":0,
+            "TypeSecondary":1,
+            "AffectTarget":[
+                2
+            ],
+            "AffectType":[
+                1
+            ],
+            "TargetType":1,
+            "Power":40,
+            "CanDoCrit":true,
+            "Range":30,
+            "MaxReloadTime":3,
+            "Description":"Wind magic attack. Power 40"
+        },
+        {
+            "Id":5,
+            "Name":"Wind Strike",
+            "IsBasicPAttack":false,
+            "RequiredLevel":15,
+            "ClassId":-1,
+            "ClassTypeId":2,
+            "Level":4,
+            "Type":0,
+            "TypeSecondary":1,
+            "AffectTarget":[
+                2
+            ],
+            "AffectType":[
+                1
+            ],
+            "TargetType":1,
+            "Power":60,
+            "CanDoCrit":true,
+            "Range":30,
+            "MaxReloadTime":3,
+            "Description":"Wind magic attack. Power 60"
+        }
+    ]
+}
+

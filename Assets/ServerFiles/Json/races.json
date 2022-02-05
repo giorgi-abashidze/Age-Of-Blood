@@ -1,0 +1,24 @@
+{
+    "Races":[
+        {
+            "Id":1,
+            "Name":"Human"
+        },
+        {
+            "Id":2,
+            "Name":"Elf"
+        },
+        {
+            "Id":3,
+            "Name":"DarkElf"
+        },
+        {
+            "Id":4,
+            "Name":"Orc"
+        },
+        {
+            "Id":5,
+            "Name":"Dwarf"
+        }
+    ]
+}

@@ -1,0 +1,12 @@
+{
+    "ClassTypes":[
+        {
+            "Id":1,
+            "Name":"Warrior"
+        },
+        {
+            "Id":2,
+            "Name":"Mage"
+        }
+    ]
+}
