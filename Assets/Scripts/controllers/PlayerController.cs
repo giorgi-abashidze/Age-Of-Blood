@@ -8,17 +8,11 @@ namespace controllers
     public class PlayerController : NetworkBehaviour
     {
         
-        private GameObject _target;
+        
         private uint _targetNetId = 0;
         private RaycastHit _hit;
-        private byte _classId;
-        private byte _level = 1;
-       
-        public byte GetLevel()
-        {
-            return _level;
-        }
 
+        
         public override void OnStartLocalPlayer()
         {
             base.OnStartLocalPlayer();
@@ -26,15 +20,6 @@ namespace controllers
             NetworkClient.RegisterHandler<DamageMessage>(OnNotifyDamage);
         }
 
-        public GameObject GetTarget()
-        {
-            return _target;
-        }
-        
-        public byte GetClassId()
-        {
-            return _classId;
-        }
         
         public uint GetTargetNetId()
         {

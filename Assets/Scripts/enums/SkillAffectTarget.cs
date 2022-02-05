@@ -13,6 +13,8 @@ namespace enums
         MDef,
         CritRate,
         CritPower,
+        MCritRate,
+        MCritPower,
         Evasion,
         Accuracy,
         AbilityMove,

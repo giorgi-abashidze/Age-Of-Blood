@@ -9,11 +9,16 @@ namespace models
     public class Skill{
 
         public ushort Id {get;set;}
+        
+        public bool isBasicPAttack { get; set; }
         public string Name {get;set;}
         public byte RequiredLevel { get; set; }
         public byte ClassId { get; set; }
         public byte Level {get;set;}
-
+        
+        //time in seconds (if its a buff)
+        public float Time {get;set;}
+        
         public SkillType Type {get;set;}
 
         public SkillSecondaryType TypeSecondary {get;set;}
@@ -25,7 +30,13 @@ namespace models
         public SkillTargetType TargetType {get;set;}
 
         public int Power {get;set;}
-
+        
+        public int Chance {get;set;}
+        
+        public bool canDoCrit { get; set; }
+        
+        //used as affect radius if skill is massive and dont need target
+        //else as minimum range
         public int Range {get;set;}
 
         public int MaxReloadTime {get;set;}
@@ -40,7 +51,6 @@ namespace models
             
             this.Reloading = true;
             ReloadValue = (float)MaxReloadTime;
-            AbilityManager.Instance.PutInCooldown(this);
         }
 
     }

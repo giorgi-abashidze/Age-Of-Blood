@@ -1,3 +1,4 @@
+using System;
 using Mirror;
 using UnityEngine;
 
@@ -5,7 +6,13 @@ namespace controllers
 {
     public class InputController : NetworkBehaviour
     {
-        
+        private AbilityManager _abilityManager;
+
+        private void Start()
+        {
+            _abilityManager = gameObject.GetComponent<AbilityManager>();
+        }
+
         void OnGUI()
         {
             if (!isLocalPlayer)
@@ -16,10 +23,10 @@ namespace controllers
             {
 
                 if(e.keyCode >= KeyCode.F1 && e.keyCode <= KeyCode.F12){
-                    AbilityManager.Instance.UseAbilityFromFPanel(e.keyCode);
+                    _abilityManager.UseAbilityFromFPanel(e.keyCode);
                 }
                 else if(e.keyCode >= KeyCode.Alpha0 && e.keyCode <= KeyCode.Alpha9){
-                    AbilityManager.Instance.UseAbilityFromNumPanel(e.keyCode);
+                    _abilityManager.UseAbilityFromNumPanel(e.keyCode);
                 }
             
             }

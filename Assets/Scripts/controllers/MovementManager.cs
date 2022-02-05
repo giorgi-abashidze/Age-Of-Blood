@@ -1,4 +1,5 @@
 ﻿using System;
+using helpers;
 using Mirror;
 using network.messages;
 using UnityEngine;
@@ -11,10 +12,18 @@ namespace controllers
         
         private NavMeshAgent _agent;
         private Camera _mainCam;
+        
+        [SyncVar]
+        public bool _canMove = true;
 
-        private bool _canMove = true;
+        [Command]
+        void CmdRequestMove(MoveRequest request)
+        {
+            OnMoveRequest(request);
+        }
 
-
+        
+        
         public override void OnStartLocalPlayer()
         {
             base.OnStartLocalPlayer();
@@ -22,7 +31,7 @@ namespace controllers
             NetworkClient.RegisterHandler<MoveRequest>(OnMoveRequest);
         }
         
-        [ClientCallback]
+        [ClientRpc]
         private void OnMoveRequest(MoveRequest msg)
         {
             if(netId == msg.IssuerNetId)
@@ -36,12 +45,6 @@ namespace controllers
                     manager.MoveToPoint(msg.TargetPoint);
                 }
             }
-        }
-
-
-        public void SetCanMove(bool value)
-        {
-            _canMove = value;
         }
         
         public void StopAgent()
@@ -81,9 +84,9 @@ namespace controllers
             
             if (Input.GetMouseButtonDown(0))
             {
-                if (Physics.Raycast(_mainCam.ScreenPointToRay(Input.mousePosition), out var hit, 100)) {
+                if (Physics.Raycast(_mainCam.ScreenPointToRay(Input.mousePosition), out var hit, Constants.MoveRange)) {
                     if(hit.transform.CompareTag("Terrain") && _canMove){
-                        NetworkClient.Send(new MoveRequest
+                        CmdRequestMove(new MoveRequest
                         {
                             IssuerNetId = netId,
                             CurrentPoint = transform.position,

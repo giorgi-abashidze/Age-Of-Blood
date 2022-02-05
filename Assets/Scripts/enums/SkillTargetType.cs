@@ -3,6 +3,8 @@ namespace enums
     public  enum SkillTargetType: byte{
         Self,
         Target,
-        Party
+        Party,
+        //massive
+        NoTarget
     }
 }
