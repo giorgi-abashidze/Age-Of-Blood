@@ -2,17 +2,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using helpers;
 using Mirror;
 using models;
 using network.messages;
-using Telepathy;
 using UnityEngine;
 using System.IO;
 using enums;
-using UnityEditor.Experimental.TerrainAPI;
-using Random = System.Random;
+using Random = UnityEngine.Random;
+
 
 namespace controllers
 {
@@ -546,7 +544,6 @@ namespace controllers
                            
                         }
                         
-
                         if (ability.TypeSecondary == SkillSecondaryType.Magic)
                         {
                             chance -= (targetStats.mDef - playerStats.mAtk) * 10;
@@ -558,11 +555,10 @@ namespace controllers
 
                         if (chance < 100)
                         {
-                            var randomStart = levelDiff < -10 ? 10 : 0;
-                            int rand = new Random().Next(randomStart, chance);
-                            int rand2 = new Random().Next(0, 10);
 
-                            if (rand / 2 < rand2)
+                            int rand =  Random.Range(0, 100);
+                            
+                            if (rand > chance)
                             {
                                 if(playerStats.role == 0)
                                     TargetNotifySelfAbilityEffect(7,ability.Id);
@@ -819,10 +815,10 @@ namespace controllers
                                             chance += playerStats.accuracy - (targetStats.evasion / 2);
                                             if (chance < 100)
                                             {
-                                                int rand = new Random().Next(chance, 100);
-                                                int rand2 = new Random().Next(0, 50);
+                                                int rand =  Random.Range(0, 100);
+                                              
 
-                                                if (rand / 2 < rand2)
+                                                if (rand > chance)
                                                 {
                                                     if(playerStats.role == 0)
                                                         TargetNotifySelfAbilityEffect(8,ability.Id);
@@ -836,10 +832,10 @@ namespace controllers
                                             if (ability.canDoCrit)
                                             {
                                                 critChance = playerStats.critRate / 4;
-                                                int rand = new Random().Next(critChance, 100);
-                                                int rand2 = new Random().Next(0, 50);
+                                                int rand =  Random.Range(0,100);
+                                               
 
-                                                if (rand / 2 > rand2)
+                                                if (rand <= critChance)
                                                 {
                                                     isCrit = true;
                                                     damage += playerStats.critPower * 2;
@@ -869,10 +865,10 @@ namespace controllers
                                             if (ability.canDoCrit)
                                             {
                                                 critChance = playerStats.mCritRate / 4;
-                                                int rand = new Random().Next(critChance, 100);
-                                                int rand2 = new Random().Next(30, 50);
+                                                int rand = Random.Range(0, 100);
+                                            
 
-                                                if (rand / 2 > rand2)
+                                                if (rand <= critChance)
                                                 {
                                                     isCrit = true;
                                                     damage += playerStats.mCritPower * 2;
@@ -935,10 +931,9 @@ namespace controllers
                                             chance += playerStats.accuracy - (targetStats.evasion / 2);
                                             if (chance < 100)
                                             {
-                                                int rand = new Random().Next(chance, 100);
-                                                int rand2 = new Random().Next(0, 50);
-
-                                                if (rand / 2 < rand2)
+                                                int rand =  Random.Range(0, 100);
+                                                
+                                                if (rand > chance)
                                                 {
                                                     if(playerStats.role == 0)
                                                         TargetNotifySelfAbilityEffect(8,ability.Id);
@@ -952,10 +947,10 @@ namespace controllers
                                             if (ability.canDoCrit)
                                             {
                                                 critChance = playerStats.critRate / 4;
-                                                int rand = new Random().Next(critChance, 100);
-                                                int rand2 = new Random().Next(0, 50);
+                                                int rand =  Random.Range(0, 100);
+                                              
 
-                                                if (rand / 2 > rand2)
+                                                if (rand <= critChance)
                                                 {
                                                     isCrit = true;
                                                     damage += playerStats.critPower * 2;
@@ -993,10 +988,10 @@ namespace controllers
                                             if (ability.canDoCrit)
                                             {
                                                 critChance = playerStats.mCritRate / 4;
-                                                int rand = new Random().Next(critChance, 100);
-                                                int rand2 = new Random().Next(30, 50);
+                                                int rand = Random.Range(0, 100);
+                                               
 
-                                                if (rand / 2 > rand2)
+                                                if (rand <= critChance)
                                                 {
                                                     isCrit = true;
                                                     damage += playerStats.mCritPower * 2;
@@ -1034,10 +1029,10 @@ namespace controllers
                                             if (ability.canDoCrit)
                                             {
                                                 critChance = playerStats.mCritRate / 4;
-                                                int rand = new Random().Next(critChance, 100);
-                                                int rand2 = new Random().Next(30, 50);
+                                                int rand = Random.Range(0, 100);
+                                               
 
-                                                if (rand / 2 > rand2)
+                                                if (rand <= critChance)
                                                 {
                                                     isCrit = true;
                                                     damage += playerStats.mCritPower * 2;
