@@ -7,7 +7,7 @@ namespace controllers
 {
     public class CameraController: NetworkBehaviour{
 
-        private const float MouseSensitivity = 80f;
+        private const float MouseSensitivity = 60f;
 
         private CinemachineFreeLook _cam;
 

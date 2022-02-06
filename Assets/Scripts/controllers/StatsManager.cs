@@ -15,9 +15,9 @@ namespace controllers
         public byte level { get; set; }
         public double xp { get; set; }
         public byte classId { get; set; }
+        public byte classType { get; set; }
         public int maxHp { get; set; }
-        [SyncVar] 
-        public int hp;
+        public int hp { get; set; }
         public int maxMp { get; set; }
         public int mp { get; set; }
         public int maxCp { get; set; }
@@ -36,6 +36,5 @@ namespace controllers
         public int accuracy { get; set; }
         public int evasion { get; set; }
         
-
     }
 }

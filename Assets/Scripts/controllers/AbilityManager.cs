@@ -55,7 +55,7 @@ namespace controllers
             if (dist > ability.Range)
                 return;
             
-            if (request.IssuerClassId != ability.ClassId || ability.RequiredLevel > request.IssuerLevel)
+            if (ability.RequiredLevel > request.IssuerLevel)
                 return;
 
             var targetIdentity = target.GetComponent<NetworkIdentity>();
@@ -81,12 +81,19 @@ namespace controllers
                     TargetNotifySelf(11);
                     return;
                 }
+                
+                if(ability.ConsumeType == ConsumeType.Mp)
+                    playerStats.mp -= ability.ConsumeValue;
+                if(ability.ConsumeType == ConsumeType.Hp)
+                    playerStats.hp -= ability.ConsumeValue;
             }
             
             if (ability.TypeSecondary == SkillSecondaryType.Magic && !ability.IsBasicPAttack && !playerAbilityManager._canDoMSkill)
                 return;
             if (ability.TypeSecondary == SkillSecondaryType.Physical && !ability.IsBasicPAttack && !playerAbilityManager._canDoWSkill)
                 return;
+            
+            
             
             //self target
             if (isSelfTarget)
@@ -311,6 +318,9 @@ namespace controllers
                                                 TargetNotifySelfAbilityEffect(2,ability.Id);
                                         }
                                         break;
+                                    case SkillAffectType.Heal:
+                                        playerAbilityManager._canBeHealed = true;
+                                        break;
                                 }
                                 break;
                             case SkillAffectTarget.Mp:
@@ -331,7 +341,7 @@ namespace controllers
                                 switch (ability.AffectType[i])
                                 {
                                     case SkillAffectType.Heal:
-                                        playerMovementManager._canMove = true;
+                                        playerMovementManager.canMove = true;
                                         if(playerStats.role == 0)
                                             TargetNotifySelfAbilityEffect(6,ability.Id);
                                         break;
@@ -776,7 +786,7 @@ namespace controllers
                                     switch (ability.AffectType[i])
                                     {
                                         case SkillAffectType.Block:
-                                            targetMovementManager._canMove = false;
+                                            targetMovementManager.canMove = false;
                                             break;
                                     }
                                     break;
@@ -1107,7 +1117,7 @@ namespace controllers
                                 switch (ability.AffectType[i])
                                 {
                                     case SkillAffectType.Heal:
-                                        targetMovementManager._canMove = true;
+                                        targetMovementManager.canMove = true;
                                         if(targetStats.role == 0)
                                             TargetNotifyAbilityEffect(targetIdentity.connectionToClient,1,ability.Id);
                                         break;
@@ -1216,7 +1226,7 @@ namespace controllers
                         switch (ability.AffectType[i])
                         {
                             case SkillAffectType.Block:
-                                movementManager._canMove = true;
+                                movementManager.canMove = true;
                                 break;
                         }
                         break;
@@ -1423,7 +1433,7 @@ namespace controllers
         
         //Write panel config to json file
         [Client]
-        private void WriteSkillPanelConfig()
+        private void SaveSkillPanelConfig()
         {
             
             File.WriteAllText(Application.persistentDataPath + "/FPanelData.json", JsonUtility.ToJson(_fPanel));
