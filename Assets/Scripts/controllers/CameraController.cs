@@ -6,9 +6,7 @@ using UnityEngine;
 namespace controllers
 {
     public class CameraController: NetworkBehaviour{
-
-        private const float MouseSensitivity = 60f;
-
+        
         private CinemachineFreeLook _cam;
 
         private const float MaxHeight = 12.0f;
@@ -49,8 +47,8 @@ namespace controllers
                 if (!(_cam.m_Orbits[1].m_Height < MaxHeight))
                     return axisName switch
                     {
-                        "Mouse X" => Input.GetMouseButton(1) ? Input.GetAxis("Mouse X") * MouseSensitivity * Time.deltaTime : 0,
-                        "Mouse Y" => Input.GetMouseButton(1) ? Input.GetAxis("Mouse Y") * MouseSensitivity * Time.deltaTime : 0,
+                        "Mouse X" => Input.GetMouseButton(1) ? Input.GetAxis("Mouse X"): 0,
+                        "Mouse Y" => Input.GetMouseButton(1) ? Input.GetAxis("Mouse Y"): 0,
                         _ => Input.GetAxis(axisName)
                     };
                 _cam.m_Orbits[1].m_Height += scroll ;
@@ -63,8 +61,8 @@ namespace controllers
 
             return axisName switch
             {
-                "Mouse X" => Input.GetMouseButton(1) ? Input.GetAxis("Mouse X") * MouseSensitivity * Time.deltaTime : 0,
-                "Mouse Y" => Input.GetMouseButton(1) ? Input.GetAxis("Mouse Y") * MouseSensitivity * Time.deltaTime : 0,
+                "Mouse X" => Input.GetMouseButton(1) ? Input.GetAxis("Mouse X"): 0,
+                "Mouse Y" => Input.GetMouseButton(1) ? Input.GetAxis("Mouse Y"): 0,
                 _ => Input.GetAxis(axisName)
             };
         }

@@ -12,9 +12,10 @@ namespace controllers
     public class MovementManager: NetworkBehaviour
     {
         
-        private NavMeshAgent _agent;
+
         private Camera _mainCam;
         [FormerlySerializedAs("_canMove")]
+        [SyncVar]
         public bool canMove = true;
         [FormerlySerializedAs("_destination")]
         [SyncVar(hook = nameof(OnDestinationChanged))]
@@ -23,7 +24,10 @@ namespace controllers
         [SyncVar(hook = nameof(OnCurrentPositionChanged))]
         public Vector3 currentPosition = Vector3.zero;
 
+        private Rigidbody _rigidbody;
+        
         private bool _moving = false;
+        private bool _rotating = false;
 
         [Command]
         void CmdRequestMove(MoveRequest request)
@@ -47,27 +51,21 @@ namespace controllers
         {
             if (canMove && newValue != Vector3.zero)
             {
-                if(_agent.isStopped)
-                    _agent.isStopped = false;
-                _agent.ResetPath();
-                _agent.destination = newValue;
-
                 _moving = true;
+                _rotating = true;
             }
 
         }
         
         public void OnCurrentPositionChanged(Vector3 oldValue,Vector3 newValue)
         {
-            _agent.velocity = Vector3.zero;
-            _agent.ResetPath();
-            _agent.isStopped = true;
+
             _moving = false;
+            _rotating = false;
             var dist = Vector3.Distance(transform.position, newValue);
             if (dist > 2)
             {
                 transform.position = newValue;
-                
             }
 
         }
@@ -81,24 +79,49 @@ namespace controllers
         
         private void Start()
         {
-            _agent = GetComponent<NavMeshAgent>();
-            
+            _rigidbody = GetComponent<Rigidbody>();
         }
-        
+
+        private void FixedUpdate()
+        {
+           if(destination != Vector3.zero && canMove)
+               _rigidbody.MovePosition(Vector3.MoveTowards(transform.position, destination, 2 * Time.deltaTime));
+
+           if (destination != Vector3.zero && _rotating)
+           {
+               
+               var localTarget = transform.InverseTransformPoint(destination);
+     
+               var angle = Mathf.Atan2(localTarget.x, localTarget.z) * Mathf.Rad2Deg;
+ 
+               var eulerAngleVelocity  = new Vector3 (0, angle, 0);
+               var deltaRotation  = Quaternion.Euler(eulerAngleVelocity * 5 * Time.deltaTime );
+               
+               _rigidbody.MoveRotation(_rigidbody.rotation * deltaRotation);
+
+               if (angle >= -0.5 && angle <= 0.5)
+                   _rotating = false;
+           }
+ 
+        }
+
+        private void LateUpdate()
+        {
+            if (_rigidbody.position == destination && _moving)
+            {
+                _moving = false;
+                _rigidbody.velocity = Vector3.zero;
+                if(isLocalPlayer)
+                    CmdNotifyArrived(transform.position);
+            }
+        }
+
         void Update()
         {
             
             if (!isLocalPlayer)
                 return;
 
-            
-            if (_agent.remainingDistance <= _agent.stoppingDistance && _moving)
-            {
-                _moving = false;
-                _agent.velocity = Vector3.zero;
-                CmdNotifyArrived(transform.position);
-            }
-            
             if (Input.GetMouseButtonDown(0))
             {
                 if (Physics.Raycast(_mainCam.ScreenPointToRay(Input.mousePosition), out var hit, Constants.MoveRange)) {
