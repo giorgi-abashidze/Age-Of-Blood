@@ -3,7 +3,7 @@
 namespace models
 {
     [Serializable]
-    public class Race
+    public class ClassType
     {
         public byte Id;
         public string Name;

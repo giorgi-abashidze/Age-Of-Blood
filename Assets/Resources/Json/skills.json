@@ -1,5 +1,5 @@
-{
-    "Skills":[
+
+{"Skills":[
         {
             "Id":1,
             "Name":"Attack",
@@ -124,6 +124,6 @@
             "MaxReloadTime":3,
             "Description":"Wind magic attack. Power 60"
         }
-    ]
-}
+]}
+
 

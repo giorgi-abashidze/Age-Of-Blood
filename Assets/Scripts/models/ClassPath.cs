@@ -1,10 +1,16 @@
-﻿namespace models
+﻿using System;
+
+namespace models
 {
+    [Serializable]
     public class ClassPath
-    {   
-        public byte ClassId { get; set; }
-        public byte ParentId { get; set; }
-        public byte RaceId { get; set; }
-        public string Name { get; set; }
+    {
+        public byte Id;
+        public byte ParentId;
+        public byte RaceId;
+        public byte RequiredLevel;
+        public byte ClassTypeId;
+        public string Name;
+
     }
 }

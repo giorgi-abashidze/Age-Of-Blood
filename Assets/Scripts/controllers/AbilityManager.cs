@@ -9,6 +9,7 @@ using network.messages;
 using UnityEngine;
 using System.IO;
 using enums;
+using network;
 using Random = UnityEngine.Random;
 
 
@@ -19,7 +20,7 @@ namespace controllers
         private readonly SortedDictionary<KeyCode,ushort> _fPanel = new SortedDictionary<KeyCode,ushort>();
         private readonly SortedDictionary<KeyCode,ushort> _numPanel = new SortedDictionary<KeyCode,ushort>();
         
-        private SortedDictionary<ushort,Skill> _allAbilities = new SortedDictionary<ushort,Skill>();
+       
         
         private SortedDictionary<ushort,Skill> _allAbilitiesOnClient = new SortedDictionary<ushort,Skill>();
         private SortedDictionary<ushort,Skill> _classAbilities = new SortedDictionary<ushort,Skill>();
@@ -41,14 +42,21 @@ namespace controllers
 
         private StatsManager _statsManager;
         private GameObject _target;
-        
+
+        public override void OnStartServer()
+        {
+            base.OnStartServer();
+            
+           
+        }
+
         [Command]
         void CmdRequestAbilityUse(GameObject player,GameObject target, AbilityUseRequest request)
         {
-            if (!_allAbilities.ContainsKey(request.SkillId))
+            if (!MyNetworkManager.AllAbilities.ContainsKey(request.SkillId))
                 return;
             
-            var ability = _allAbilities[request.SkillId];
+            var ability = MyNetworkManager.AllAbilities[request.SkillId];
             
             var dist = Vector3.Distance(player.transform.position, target.transform.position);
             
@@ -1138,14 +1146,14 @@ namespace controllers
         [Command]
         void CmdRemoveBuffDebuff(GameObject player,ushort abilityId)
         {
-            if (!_allAbilities.ContainsKey(abilityId))
+            if (!MyNetworkManager.AllAbilities.ContainsKey(abilityId))
                 return;
             
             var abilityManager = player.GetComponent<AbilityManager>();
             var statsManager = player.GetComponent<StatsManager>();
             var movementManager = player.GetComponent<MovementManager>();
 
-            var ability = _allAbilities[abilityId];
+            var ability = MyNetworkManager.AllAbilities[abilityId];
 
             for (var i = 0; i < ability.AffectTarget.Count; i++)
             {
@@ -1449,12 +1457,10 @@ namespace controllers
             base.OnStartLocalPlayer();
 
             LoadSkillPanelConfig();
-        }
-
-        private void Start()
-        {
             _statsManager = gameObject.GetComponent<StatsManager>();
         }
+
+        
 
         private void Update()
         {

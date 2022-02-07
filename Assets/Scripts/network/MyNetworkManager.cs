@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using helpers;
 using kcp2k;
 using Mirror;
 using models;
@@ -14,6 +15,7 @@ namespace network
     {
         private const string SpawnableDir = "Prefabs/";
         private readonly List<GameObject> _spawnList = new List<GameObject>();
+        public static readonly SortedDictionary<ushort,Skill> AllAbilities = new SortedDictionary<ushort,Skill>();
         
         public bool isServer;
 
@@ -35,8 +37,18 @@ namespace network
             {
                 
                 Debug.Log(">>>>>>>>> Starting Server... <<<<<<<<<<",this);
+                
+                JsonHelper.LoadSkillsFromJson().ForEach(c =>
+                {
+                    AllAbilities.Add(c.Id,c);
+                });
+                
+                Debug.Log(">>>>>>>>> "+AllAbilities.Count+" Skills loaded <<<<<<<<<<",this);
+                
                 StartServer();
+                
                 Debug.Log(">>>>>>>>> Server Started at: "+networkAddress+" :"+GetComponent<KcpTransport>().Port+" <<<<<<<<<<",this);
+                
             }
 
         }

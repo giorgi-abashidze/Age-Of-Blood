@@ -11,7 +11,7 @@ namespace helpers
         {
             writer.WriteUShort(value.Id);
             writer.WriteByte(value.Level);
-            writer.WriteByte(value.ClassId);
+            writer.WriteShort(value.ClassId);
 
         }
         

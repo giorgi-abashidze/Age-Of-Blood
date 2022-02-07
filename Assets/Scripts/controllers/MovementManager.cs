@@ -12,7 +12,6 @@ namespace controllers
     public class MovementManager: NetworkBehaviour
     {
         
-
         private Camera _mainCam;
         [FormerlySerializedAs("_canMove")]
         [SyncVar]
