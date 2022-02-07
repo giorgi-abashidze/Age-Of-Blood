@@ -20,17 +20,13 @@ namespace controllers
         private readonly SortedDictionary<KeyCode,ushort> _fPanel = new SortedDictionary<KeyCode,ushort>();
         private readonly SortedDictionary<KeyCode,ushort> _numPanel = new SortedDictionary<KeyCode,ushort>();
         
-       
-        
-        private SortedDictionary<ushort,Skill> _allAbilitiesOnClient = new SortedDictionary<ushort,Skill>();
-        private SortedDictionary<ushort,Skill> _classAbilities = new SortedDictionary<ushort,Skill>();
+        private readonly SortedDictionary<ushort,Skill> _classAbilities = new SortedDictionary<ushort,Skill>();
 
         //int skillId, float remainingTime
         private readonly Dictionary<ushort,float> _buffList = new Dictionary<ushort,float>();
         private readonly SortedDictionary<ushort,float> _deBuffList = new SortedDictionary<ushort,float>();
         
         private readonly List<Skill> _cooldownList = new List<Skill>();
-        
         
         //Can do magic skill
         private bool _canDoMSkill = true;
@@ -42,14 +38,7 @@ namespace controllers
 
         private StatsManager _statsManager;
         private GameObject _target;
-
-        public override void OnStartServer()
-        {
-            base.OnStartServer();
-            
-           
-        }
-
+        
         [Command]
         void CmdRequestAbilityUse(GameObject player,GameObject target, AbilityUseRequest request)
         {
@@ -1385,7 +1374,7 @@ namespace controllers
         [TargetRpc]
         void TargetEffectRemoved(int msgId,ushort skillId)
         {
-            Debug.Log((NotificationMessages.AbilityNotifications[msgId],_allAbilitiesOnClient[skillId].Name),this);
+            Debug.Log((NotificationMessages.AbilityNotifications[msgId],MyNetworkManager.AllAbilities[skillId].Name),this);
         }
 
         [TargetRpc]
@@ -1401,13 +1390,13 @@ namespace controllers
         [TargetRpc]
         void TargetNotifyAbilityEffect(NetworkConnection target, int msgId,ushort abilityId)
         {
-            Debug.Log((NotificationMessages.AbilityNotifications[msgId],_allAbilitiesOnClient[abilityId].Name),this);
+            Debug.Log((NotificationMessages.AbilityNotifications[msgId],MyNetworkManager.AllAbilities[abilityId].Name),this);
         }
         
         [TargetRpc]
         void TargetNotifySelfAbilityEffect(int msgId,ushort abilityId)
         {
-            Debug.Log((NotificationMessages.AbilityNotifications[msgId],_allAbilitiesOnClient[abilityId].Name),this);
+            Debug.Log((NotificationMessages.AbilityNotifications[msgId],MyNetworkManager.AllAbilities[abilityId].Name),this);
         }
         
         [TargetRpc]
@@ -1458,6 +1447,20 @@ namespace controllers
 
             LoadSkillPanelConfig();
             _statsManager = gameObject.GetComponent<StatsManager>();
+
+            var classId = _statsManager.classId;
+            var parentClassId = MyNetworkManager.Classes[classId].ParentId;
+            var grandParentId = 0;
+            if(parentClassId != 0)
+                grandParentId = MyNetworkManager.Classes[parentClassId].ParentId;
+            
+            foreach(var keyPair in MyNetworkManager.AllAbilities){
+                if (keyPair.Value.ClassId == classId || keyPair.Value.ClassId == parentClassId ||
+                    keyPair.Value.ClassId == grandParentId)
+                {
+                    _classAbilities.Add(keyPair.Key,keyPair.Value);
+                }
+            }
         }
 
         
@@ -1497,6 +1500,9 @@ namespace controllers
             
             if (_fPanel.ContainsKey(key))
             {
+                if (!_classAbilities.ContainsKey(_fPanel[key]))
+                    return;
+                
                 var skill = _classAbilities[_fPanel[key]];
 
                 if (skill != null)
@@ -1548,9 +1554,14 @@ namespace controllers
         [Client]
         public void UseAbilityFromNumPanel(KeyCode key)
         {
+          
             
             if (_numPanel.ContainsKey(key))
             {
+                
+                if (!_classAbilities.ContainsKey(_numPanel[key]))
+                    return;
+                
                 var skill = _classAbilities[_fPanel[key]];
 
                 if (skill != null)

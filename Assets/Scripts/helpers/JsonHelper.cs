@@ -11,29 +11,29 @@ namespace helpers
         public static List<Skill> LoadSkillsFromJson()
         {
             var jsonTextFile = Resources.Load<TextAsset>("Json/skills");
-
-            return JsonUtility.FromJson<SkillsWrapper>(jsonTextFile.text).Skills;
+            var wrapper = JsonUtility.FromJson<SkillsWrapper>(jsonTextFile.text);
+            return wrapper.Skills ?? new List<Skill>();
         }
         
         public static List<ClassPath> LoadClassesFromJson()
         {
             var jsonTextFile = Resources.Load<TextAsset>("Json/classes");
-
-            return JsonUtility.FromJson<List<ClassPath>>(jsonTextFile.text);
+            var wrapper = JsonUtility.FromJson<ClassesWrapper>(jsonTextFile.text);
+            return wrapper.Classes ?? new List<ClassPath>();
         }
         
         public static List<Race> LoadRacesFromJson()
         {
             var jsonTextFile = Resources.Load<TextAsset>("Json/races");
-
-            return JsonUtility.FromJson<List<Race>>(jsonTextFile.text);
+            var wrapper = JsonUtility.FromJson<RacesWrapper>(jsonTextFile.text);
+            return wrapper.Races ?? new List<Race>();
         }
         
         public static List<ClassType> LoadClassTypesFromJson()
         {
             var jsonTextFile = Resources.Load<TextAsset>("Json/classTypes");
-
-            return JsonUtility.FromJson<List<ClassType>>(jsonTextFile.text);
+            var wrapper = JsonUtility.FromJson<ClassTypesWrapper>(jsonTextFile.text);
+            return wrapper.ClassTypes ?? new List<ClassType>();
         }
     }
 }

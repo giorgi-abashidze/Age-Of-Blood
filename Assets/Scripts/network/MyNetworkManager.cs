@@ -16,6 +16,9 @@ namespace network
         private const string SpawnableDir = "Prefabs/";
         private readonly List<GameObject> _spawnList = new List<GameObject>();
         public static readonly SortedDictionary<ushort,Skill> AllAbilities = new SortedDictionary<ushort,Skill>();
+        public static readonly SortedDictionary<byte,Race> Races = new SortedDictionary<byte,Race>();
+        public static readonly SortedDictionary<byte,ClassPath> Classes = new SortedDictionary<byte,ClassPath>();
+        public static readonly SortedDictionary<byte,ClassType> ClassTypes = new SortedDictionary<byte,ClassType>();
         
         public bool isServer;
 
@@ -26,6 +29,31 @@ namespace network
             
             playerPrefab = Resources.LoadAll<GameObject>(SpawnableDir)[0];
             maxConnections = 500;
+            
+            JsonHelper.LoadSkillsFromJson().ForEach(c =>
+            {
+                AllAbilities.Add(c.Id,c);
+            });
+                
+            Debug.Log(">>>>>>>>> "+AllAbilities.Count+" Skills loaded <<<<<<<<<<",this);
+                
+            JsonHelper.LoadRacesFromJson().ForEach(c =>
+            {
+                Races.Add(c.Id,c);
+            });
+                
+            JsonHelper.LoadClassesFromJson().ForEach(c =>
+            {
+                Classes.Add(c.Id,c);
+            });
+                
+            Debug.Log(">>>>>>>>> "+Classes.Count+" Classes loaded <<<<<<<<<<",this);
+                
+            JsonHelper.LoadClassTypesFromJson().ForEach(c =>
+            {
+                ClassTypes.Add(c.Id,c);
+            });
+
             
             if (!isServer)
             {
@@ -38,12 +66,6 @@ namespace network
                 
                 Debug.Log(">>>>>>>>> Starting Server... <<<<<<<<<<",this);
                 
-                JsonHelper.LoadSkillsFromJson().ForEach(c =>
-                {
-                    AllAbilities.Add(c.Id,c);
-                });
-                
-                Debug.Log(">>>>>>>>> "+AllAbilities.Count+" Skills loaded <<<<<<<<<<",this);
                 
                 StartServer();
                 
