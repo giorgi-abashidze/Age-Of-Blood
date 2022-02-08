@@ -1,0 +1,42 @@
+﻿{
+  "BaseStats": [
+    {
+      "classType":1,
+      "maxHp": 400,
+      "maxMp": 200,
+      "maxCp": 220,
+      "pAtk": 30,
+      "mAtk": 10,
+      "critRate": 80,
+      "mCritRate": 30,
+      "critPower": 80,
+      "mCritPower": 70,
+      "speed": 80,
+      "castSpeed": 80,
+      "atkSpeed": 150,
+      "pDef": 200,
+      "mDef": 100,
+      "accuracy": 90,
+      "evasion": 40
+    },
+    {
+      "classType":2,
+      "maxHp": 300,
+      "maxMp": 400,
+      "maxCp": 150,
+      "pAtk": 10,
+      "mAtk": 30,
+      "critRate": 30,
+      "mCritRate": 50,
+      "critPower": 40,
+      "mCritPower": 80,
+      "speed": 80,
+      "castSpeed": 200,
+      "atkSpeed": 80,
+      "pDef": 100,
+      "mDef": 200,
+      "accuracy": 40,
+      "evasion": 20
+    }
+  ]
+}

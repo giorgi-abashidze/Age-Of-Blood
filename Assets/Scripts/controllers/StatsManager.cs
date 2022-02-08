@@ -1,4 +1,5 @@
 ﻿using Mirror;
+using models;
 
 namespace controllers
 {
@@ -35,6 +36,27 @@ namespace controllers
         public int mDef { get; set; }
         public int accuracy { get; set; }
         public int evasion { get; set; }
+
+        public void SetBaseStats(BaseStatsModel stats)
+        {
+            maxHp = stats.maxHp;
+            maxMp = stats.maxMp;
+            maxCp = stats.maxCp;
+            pAtk = stats.pAtk;
+            mAtk = stats.mAtk;
+            critRate = stats.critRate;
+            mCritRate = stats.mCritRate;
+            critPower = stats.critPower;
+            mCritPower = stats.mCritPower;
+            speed = stats.speed;
+            castSpeed = stats.castSpeed;
+            atkSpeed = stats.atkSpeed;
+            pDef = stats.pDef;
+            mDef = stats.mDef;
+            accuracy = stats.accuracy;
+            evasion = stats.evasion;
+        }
         
+
     }
 }

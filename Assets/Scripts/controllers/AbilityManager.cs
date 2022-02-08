@@ -1448,6 +1448,8 @@ namespace controllers
             LoadSkillPanelConfig();
             _statsManager = gameObject.GetComponent<StatsManager>();
 
+            
+            //Load class abilities, don't forget to load stats first
             var classId = _statsManager.classId;
             var parentClassId = MyNetworkManager.Classes[classId].ParentId;
             var grandParentId = 0;
@@ -1455,9 +1457,12 @@ namespace controllers
                 grandParentId = MyNetworkManager.Classes[parentClassId].ParentId;
             
             foreach(var keyPair in MyNetworkManager.AllAbilities){
-                if (keyPair.Value.ClassId == classId || keyPair.Value.ClassId == parentClassId ||
-                    keyPair.Value.ClassId == grandParentId)
+                if ((keyPair.Value.ClassId == classId || keyPair.Value.ClassId == parentClassId ||
+                    keyPair.Value.ClassId == grandParentId || keyPair.Value.ClassId == -1) && keyPair.Value.RequiredLevel >= _statsManager.level)
                 {
+                    if(keyPair.Value.ClassTypeId != -1 && keyPair.Value.ClassTypeId != _statsManager.classType)
+                        continue;
+                    
                     _classAbilities.Add(keyPair.Key,keyPair.Value);
                 }
             }

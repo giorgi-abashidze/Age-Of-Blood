@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using controllers;
 using helpers;
 using kcp2k;
 using Mirror;
@@ -19,7 +20,7 @@ namespace network
         public static readonly SortedDictionary<byte,Race> Races = new SortedDictionary<byte,Race>();
         public static readonly SortedDictionary<byte,ClassPath> Classes = new SortedDictionary<byte,ClassPath>();
         public static readonly SortedDictionary<byte,ClassType> ClassTypes = new SortedDictionary<byte,ClassType>();
-        
+        public static List<BaseStatsModel> BaseStats = new List<BaseStatsModel>();
         public bool isServer;
 
         public override void Start()
@@ -54,6 +55,9 @@ namespace network
                 ClassTypes.Add(c.Id,c);
             });
 
+
+            BaseStats = JsonHelper.LoadBaseStatsFromJson();
+           
             
             if (!isServer)
             {
@@ -88,7 +92,9 @@ namespace network
             
             var createCharMessage = new CreateCharacterMessage
             {
-                Name = "test"
+                Name = "test",
+                ClassTypeId = 1,
+                ClassId = 1
             };
             NetworkClient.Send(createCharMessage);
             
@@ -110,6 +116,12 @@ namespace network
         {
           
             var player = Instantiate(playerPrefab);
+            var statsManager = player.GetComponent<StatsManager>();
+            var baseStats = BaseStats.FirstOrDefault(s => s.classType == msg.ClassTypeId);
+            if (baseStats == null)
+                return;
+            
+            statsManager.SetBaseStats(baseStats);
             NetworkServer.AddPlayerForConnection(conn, player);
         }
 

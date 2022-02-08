@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.IO;
 using models;
 using UnityEngine;
 
@@ -34,6 +33,13 @@ namespace helpers
             var jsonTextFile = Resources.Load<TextAsset>("Json/classTypes");
             var wrapper = JsonUtility.FromJson<ClassTypesWrapper>(jsonTextFile.text);
             return wrapper.ClassTypes ?? new List<ClassType>();
+        }
+        
+        public static List<BaseStatsModel> LoadBaseStatsFromJson()
+        {
+            var jsonTextFile = Resources.Load<TextAsset>("Json/baseStats");
+            var wrapper = JsonUtility.FromJson<BaseStatsWrapper>(jsonTextFile.text);
+            return wrapper.BaseStats ?? new List<BaseStatsModel>();
         }
     }
 }
