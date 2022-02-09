@@ -9,6 +9,7 @@ using models;
 using network.messages;
 using Telepathy;
 using UnityEngine;
+using Log = kcp2k.Log;
 
 namespace network
 {
@@ -16,13 +17,14 @@ namespace network
     {
         private const string SpawnableDir = "Prefabs/";
         private readonly List<GameObject> _spawnList = new List<GameObject>();
-        public static readonly SortedDictionary<ushort,Skill> AllAbilities = new SortedDictionary<ushort,Skill>();
-        public static readonly SortedDictionary<byte,Race> Races = new SortedDictionary<byte,Race>();
-        public static readonly SortedDictionary<byte,ClassPath> Classes = new SortedDictionary<byte,ClassPath>();
-        public static readonly SortedDictionary<byte,ClassType> ClassTypes = new SortedDictionary<byte,ClassType>();
-        public static List<BaseStatsModel> BaseStats = new List<BaseStatsModel>();
+        public readonly SortedDictionary<ushort,Skill> AllAbilities = new SortedDictionary<ushort,Skill>();
+        public readonly SortedDictionary<byte,Race> Races = new SortedDictionary<byte,Race>();
+        public readonly SortedDictionary<byte,ClassPath> Classes = new SortedDictionary<byte,ClassPath>();
+        public readonly SortedDictionary<byte,ClassType> ClassTypes = new SortedDictionary<byte,ClassType>();
+        public readonly List<BaseStatsModel> BaseStats = new List<BaseStatsModel>();
+      
         public bool isServer;
-
+        
         public override void Start()
         {
             base.Start();
@@ -55,8 +57,8 @@ namespace network
                 ClassTypes.Add(c.Id,c);
             });
 
-
-            BaseStats = JsonHelper.LoadBaseStatsFromJson();
+            BaseStats.Clear();
+            BaseStats.AddRange(JsonHelper.LoadBaseStatsFromJson());
            
             
             if (!isServer)
@@ -122,6 +124,14 @@ namespace network
                 return;
             
             statsManager.SetBaseStats(baseStats);
+            
+            statsManager.classId = msg.ClassId;
+            statsManager.classType = msg.ClassTypeId;
+
+            statsManager.hp = statsManager.maxHp;
+            statsManager.mp = statsManager.maxMp;
+            statsManager.cp = statsManager.maxCp;
+            
             NetworkServer.AddPlayerForConnection(conn, player);
         }
 

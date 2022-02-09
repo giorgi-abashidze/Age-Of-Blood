@@ -23,7 +23,8 @@ namespace controllers
         [SyncVar(hook = nameof(OnCurrentPositionChanged))]
         public Vector3 currentPosition = Vector3.zero;
 
-        private Rigidbody _rigidbody;
+        private NavMeshAgent _agent;
+        
         
         private bool _moving = false;
         private bool _rotating = false;
@@ -58,7 +59,7 @@ namespace controllers
         
         public void OnCurrentPositionChanged(Vector3 oldValue,Vector3 newValue)
         {
-
+            
             _moving = false;
             _rotating = false;
             var dist = Vector3.Distance(transform.position, newValue);
@@ -78,45 +79,46 @@ namespace controllers
         
         private void Start()
         {
-            _rigidbody = GetComponent<Rigidbody>();
+            _agent = GetComponent<NavMeshAgent>();
+            _agent.updateRotation = false;
         }
-
-        private void FixedUpdate()
+        
+        
+        void Update()
         {
-           if(destination != Vector3.zero && canMove)
-               _rigidbody.MovePosition(Vector3.MoveTowards(transform.position, destination, 2 * Time.deltaTime));
+            
+            if (destination != Vector3.zero && canMove)
+                _agent.destination = destination;
 
-           if (destination != Vector3.zero && _rotating)
-           {
+            if (destination != Vector3.zero && _rotating)
+            {
                
-               var localTarget = transform.InverseTransformPoint(destination);
+                var localTarget = transform.InverseTransformPoint(destination);
      
-               var angle = Mathf.Atan2(localTarget.x, localTarget.z) * Mathf.Rad2Deg;
+                var angle = Mathf.Atan2(localTarget.x, localTarget.z) * Mathf.Rad2Deg;
  
-               var eulerAngleVelocity  = new Vector3 (0, angle, 0);
-               var deltaRotation  = Quaternion.Euler(eulerAngleVelocity * 5 * Time.deltaTime );
+                var eulerAngleVelocity  = new Vector3 (0, angle, 0);
+                var deltaRotation  = Quaternion.Euler(eulerAngleVelocity * 5 * Time.deltaTime );
                
-               _rigidbody.MoveRotation(_rigidbody.rotation * deltaRotation);
+                transform.rotation *=  deltaRotation;
 
-               if (angle >= -0.5 && angle <= 0.5)
-                   _rotating = false;
-           }
- 
-        }
-
-        private void LateUpdate()
-        {
-            if (_rigidbody.position == destination && _moving)
+                if (angle >= -0.5f && angle <= 0.5f)
+                    _rotating = false;
+            }
+            
+            
+            if (_agent.remainingDistance <= 0.2 && !_agent.hasPath && !_agent.pathPending && _moving)
             {
                 _moving = false;
-                _rigidbody.velocity = Vector3.zero;
+                destination = Vector3.zero;
+                _agent.ResetPath();
+                _agent.velocity = Vector3.zero;
+               
                 if(isLocalPlayer)
                     CmdNotifyArrived(transform.position);
             }
-        }
-
-        void Update()
-        {
+            
+            
             
             if (!isLocalPlayer)
                 return;
@@ -124,7 +126,7 @@ namespace controllers
             if (Input.GetMouseButtonDown(0))
             {
                 if (Physics.Raycast(_mainCam.ScreenPointToRay(Input.mousePosition), out var hit, Constants.MoveRange)) {
-                    if(hit.transform.CompareTag("Terrain") && canMove){
+                    if((hit.transform.CompareTag("Terrain") || hit.transform.CompareTag("Walkable")) && canMove){
                        
                         CmdRequestMove(new MoveRequest
                         {

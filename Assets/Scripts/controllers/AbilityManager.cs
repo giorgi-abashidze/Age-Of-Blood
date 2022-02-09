@@ -27,6 +27,9 @@ namespace controllers
         private readonly SortedDictionary<ushort,float> _deBuffList = new SortedDictionary<ushort,float>();
         
         private readonly List<Skill> _cooldownList = new List<Skill>();
+        private MyNetworkManager _networkManager;
+        
+        private Camera _mainCam;
         
         //Can do magic skill
         private bool _canDoMSkill = true;
@@ -39,13 +42,15 @@ namespace controllers
         private StatsManager _statsManager;
         private GameObject _target;
         
+        
+        
         [Command]
         void CmdRequestAbilityUse(GameObject player,GameObject target, AbilityUseRequest request)
         {
-            if (!MyNetworkManager.AllAbilities.ContainsKey(request.SkillId))
+            if (!_networkManager.AllAbilities.ContainsKey(request.SkillId))
                 return;
             
-            var ability = MyNetworkManager.AllAbilities[request.SkillId];
+            var ability = _networkManager.AllAbilities[request.SkillId];
             
             var dist = Vector3.Distance(player.transform.position, target.transform.position);
             
@@ -1135,14 +1140,14 @@ namespace controllers
         [Command]
         void CmdRemoveBuffDebuff(GameObject player,ushort abilityId)
         {
-            if (!MyNetworkManager.AllAbilities.ContainsKey(abilityId))
+            if (!_networkManager.AllAbilities.ContainsKey(abilityId))
                 return;
             
             var abilityManager = player.GetComponent<AbilityManager>();
             var statsManager = player.GetComponent<StatsManager>();
             var movementManager = player.GetComponent<MovementManager>();
 
-            var ability = MyNetworkManager.AllAbilities[abilityId];
+            var ability = _networkManager.AllAbilities[abilityId];
 
             for (var i = 0; i < ability.AffectTarget.Count; i++)
             {
@@ -1374,7 +1379,7 @@ namespace controllers
         [TargetRpc]
         void TargetEffectRemoved(int msgId,ushort skillId)
         {
-            Debug.Log((NotificationMessages.AbilityNotifications[msgId],MyNetworkManager.AllAbilities[skillId].Name),this);
+            Debug.Log((NotificationMessages.AbilityNotifications[msgId],_networkManager.AllAbilities[skillId].Name),this);
         }
 
         [TargetRpc]
@@ -1390,13 +1395,13 @@ namespace controllers
         [TargetRpc]
         void TargetNotifyAbilityEffect(NetworkConnection target, int msgId,ushort abilityId)
         {
-            Debug.Log((NotificationMessages.AbilityNotifications[msgId],MyNetworkManager.AllAbilities[abilityId].Name),this);
+            Debug.Log((NotificationMessages.AbilityNotifications[msgId],_networkManager.AllAbilities[abilityId].Name),this);
         }
         
         [TargetRpc]
         void TargetNotifySelfAbilityEffect(int msgId,ushort abilityId)
         {
-            Debug.Log((NotificationMessages.AbilityNotifications[msgId],MyNetworkManager.AllAbilities[abilityId].Name),this);
+            Debug.Log((NotificationMessages.AbilityNotifications[msgId],_networkManager.AllAbilities[abilityId].Name),this);
         }
         
         [TargetRpc]
@@ -1438,27 +1443,31 @@ namespace controllers
             File.WriteAllText(Application.persistentDataPath + "/NumPanelData.json", JsonUtility.ToJson(_numPanel));
             
         }
-
         
-
         public override void OnStartLocalPlayer()
         {
             base.OnStartLocalPlayer();
+            _mainCam = Camera.main;
+        }
+
+        private void OnConnectedToServer()
+        {
 
             LoadSkillPanelConfig();
             _statsManager = gameObject.GetComponent<StatsManager>();
 
+            _networkManager = GameObject.FindGameObjectWithTag("NetworkManager").GetComponent<MyNetworkManager>();
             
             //Load class abilities, don't forget to load stats first
             var classId = _statsManager.classId;
-            var parentClassId = MyNetworkManager.Classes[classId].ParentId;
+            var parentClassId = _networkManager.Classes[classId].ParentId;
             var grandParentId = 0;
             if(parentClassId != 0)
-                grandParentId = MyNetworkManager.Classes[parentClassId].ParentId;
+                grandParentId = _networkManager.Classes[parentClassId].ParentId;
             
-            foreach(var keyPair in MyNetworkManager.AllAbilities){
+            foreach(var keyPair in _networkManager.AllAbilities){
                 if ((keyPair.Value.ClassId == classId || keyPair.Value.ClassId == parentClassId ||
-                    keyPair.Value.ClassId == grandParentId || keyPair.Value.ClassId == -1) && keyPair.Value.RequiredLevel >= _statsManager.level)
+                     keyPair.Value.ClassId == grandParentId || keyPair.Value.ClassId == -1) && keyPair.Value.RequiredLevel >= _statsManager.level)
                 {
                     if(keyPair.Value.ClassTypeId != -1 && keyPair.Value.ClassTypeId != _statsManager.classType)
                         continue;
@@ -1469,10 +1478,23 @@ namespace controllers
         }
 
         
-
         private void Update()
         {
             
+            if (!isLocalPlayer)
+                return;
+
+            if (Input.GetMouseButtonDown(0))
+            {
+                if (Physics.Raycast(_mainCam.ScreenPointToRay(Input.mousePosition), out var hit, Constants.TargetRange))
+                {
+                    if (hit.transform.CompareTag("Player"))
+                    {
+                        _target = hit.transform.gameObject;
+                    }
+                }
+            }
+
             for (var i = 0; i < _cooldownList.Count;i++)
             {
                 var element = _cooldownList.ElementAt(i);

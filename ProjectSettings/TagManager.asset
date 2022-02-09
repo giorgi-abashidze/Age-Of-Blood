@@ -7,6 +7,7 @@ TagManager:
   - freelookcam
   - Terrain
   - NetworkManager
+  - Walkable
   layers:
   - Default
   - TransparentFX
