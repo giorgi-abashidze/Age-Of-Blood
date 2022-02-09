@@ -30,6 +30,7 @@ namespace controllers
         private MyNetworkManager _networkManager;
         
         private Camera _mainCam;
+        private bool _isCasting;
         
         //Can do magic skill
         private bool _canDoMSkill = true;
@@ -41,8 +42,8 @@ namespace controllers
 
         private StatsManager _statsManager;
         private GameObject _target;
-        
-        
+
+        private bool _rotatingToTarget;
         
         [Command]
         void CmdRequestAbilityUse(GameObject player,GameObject target, AbilityUseRequest request)
@@ -1480,6 +1481,21 @@ namespace controllers
         
         private void Update()
         {
+            if (_target != null && _rotatingToTarget)
+            {
+               
+                var localTarget = transform.InverseTransformPoint(_target.transform.position);
+     
+                var angle = Mathf.Atan2(localTarget.x, localTarget.z) * Mathf.Rad2Deg;
+ 
+                var eulerAngleVelocity  = new Vector3 (0, angle, 0);
+                var deltaRotation  = Quaternion.Euler(eulerAngleVelocity * 5 * Time.deltaTime );
+               
+                transform.rotation *=  deltaRotation;
+
+                if (angle >= -0.5f && angle <= 0.5f)
+                    _rotatingToTarget = false;
+            }
             
             if (!isLocalPlayer)
                 return;
@@ -1524,6 +1540,8 @@ namespace controllers
         [Client]
         public void UseAbilityFromFPanel(KeyCode key)
         {
+            if (_isCasting)
+                return;
             
             if (_fPanel.ContainsKey(key))
             {
@@ -1581,7 +1599,8 @@ namespace controllers
         [Client]
         public void UseAbilityFromNumPanel(KeyCode key)
         {
-          
+            if (_isCasting)
+                return;
             
             if (_numPanel.ContainsKey(key))
             {

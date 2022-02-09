@@ -24,11 +24,12 @@ namespace controllers
         public Vector3 currentPosition = Vector3.zero;
 
         private NavMeshAgent _agent;
-        
+        private int _baseAgentSpeed = 2;
         
         private bool _moving = false;
         private bool _rotating = false;
-
+        private bool _isCasting;
+        
         [Command]
         void CmdRequestMove(MoveRequest request)
         {
@@ -47,10 +48,37 @@ namespace controllers
             currentPosition = point;
         }
 
+        public void OnCastStart()
+        {
+            _isCasting = true;
+            _moving = false;
+            _agent.velocity = Vector3.zero;
+            _agent.ResetPath();
+            destination = Vector3.zero;
+            _rotating = false;
+            if (isLocalPlayer)
+                CmdNotifyArrived(transform.position);
+            
+        }
+
+        //must be called from ability manager after skill cast end
+        public void OnCastEnd()
+        {
+            _isCasting = false;
+            
+            if (canMove && destination != Vector3.zero)
+            {
+                _agent.destination = destination;
+                _moving = true;
+                _rotating = true;
+            }
+        }
+
         public void OnDestinationChanged(Vector3 oldValue,Vector3 newValue)
         {
-            if (canMove && newValue != Vector3.zero)
+            if (canMove && newValue != Vector3.zero && !_isCasting)
             {
+                _agent.destination = destination;
                 _moving = true;
                 _rotating = true;
             }
@@ -80,16 +108,14 @@ namespace controllers
         private void Start()
         {
             _agent = GetComponent<NavMeshAgent>();
+            _agent.speed = _baseAgentSpeed;
             _agent.updateRotation = false;
         }
         
         
         void Update()
         {
-            
-            if (destination != Vector3.zero && canMove)
-                _agent.destination = destination;
-
+ 
             if (destination != Vector3.zero && _rotating)
             {
                
@@ -107,7 +133,7 @@ namespace controllers
             }
             
             
-            if (_agent.remainingDistance <= 0.2 && !_agent.hasPath && !_agent.pathPending && _moving)
+            if (_agent.remainingDistance <= _agent.stoppingDistance && !_agent.hasPath && !_agent.pathPending && _moving)
             {
                 _moving = false;
                 destination = Vector3.zero;
@@ -118,8 +144,7 @@ namespace controllers
                     CmdNotifyArrived(transform.position);
             }
             
-            
-            
+
             if (!isLocalPlayer)
                 return;
 
