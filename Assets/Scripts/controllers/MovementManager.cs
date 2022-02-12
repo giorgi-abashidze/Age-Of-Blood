@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections;
-using helpers;
+﻿using helpers;
 using Mirror;
 using network.messages;
 using UnityEngine;
@@ -22,7 +20,7 @@ namespace controllers
         [FormerlySerializedAs("_currentPosition")]
         [SyncVar(hook = nameof(OnCurrentPositionChanged))]
         public Vector3 currentPosition = Vector3.zero;
-
+        private Vector3 _desiredDestination = Vector3.zero;
         private NavMeshAgent _agent;
         private int _baseAgentSpeed = 2;
         
@@ -50,6 +48,7 @@ namespace controllers
 
         public void OnCastStart()
         {
+            _desiredDestination = Vector3.zero;
             _isCasting = true;
             _moving = false;
             _agent.velocity = Vector3.zero;
@@ -66,11 +65,16 @@ namespace controllers
         {
             _isCasting = false;
             
-            if (canMove && destination != Vector3.zero)
+            if (canMove && _desiredDestination != Vector3.zero)
             {
-                _agent.destination = destination;
-                _moving = true;
-                _rotating = true;
+                CmdRequestMove(new MoveRequest
+                {
+                    IssuerNetId = netId,
+                    CurrentPoint = transform.position,
+                    TargetPoint = _desiredDestination
+                });
+                
+                _desiredDestination = Vector3.zero;
             }
         }
 
@@ -152,13 +156,24 @@ namespace controllers
             {
                 if (Physics.Raycast(_mainCam.ScreenPointToRay(Input.mousePosition), out var hit, Constants.MoveRange)) {
                     if((hit.transform.CompareTag("Terrain") || hit.transform.CompareTag("Walkable")) && canMove){
-                       
-                        CmdRequestMove(new MoveRequest
+
+                        if (_isCasting)
                         {
-                            IssuerNetId = netId,
-                            CurrentPoint = transform.position,
-                            TargetPoint = hit.point
-                        });
+                            _desiredDestination = hit.point;
+                        }
+                        else
+                        {
+                            _desiredDestination = Vector3.zero;
+                            
+                            CmdRequestMove(new MoveRequest
+                            {
+                                IssuerNetId = netId,
+                                CurrentPoint = transform.position,
+                                TargetPoint = hit.point
+                            });
+                        }
+
+                       
                     } 
                 }
             }
