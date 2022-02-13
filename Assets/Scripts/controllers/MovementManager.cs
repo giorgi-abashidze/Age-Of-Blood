@@ -1,4 +1,5 @@
-﻿using helpers;
+﻿using System;
+using helpers;
 using Mirror;
 using network.messages;
 using UnityEngine;
@@ -28,8 +29,8 @@ namespace controllers
         private bool _rotating = false;
         private bool _isCasting;
         private Vector3 _currentPathCorner = Vector3.zero;
-        private int _curremtPAthCornerIndex = 1;
-        
+        private const int CurrentPathCornerIndex = 1;
+
         [Command]
         void CmdRequestMove(MoveRequest request)
         {
@@ -118,25 +119,23 @@ namespace controllers
             _agent.updateRotation = false;
         }
         
-        
         void Update()
         {
  
             if (destination != Vector3.zero && _rotating)
             {
 
-                _currentPathCorner = _agent.path.corners[_curremtPAthCornerIndex];
+                _currentPathCorner = _agent.path.corners[CurrentPathCornerIndex];
                     
                 var localTarget = transform.InverseTransformPoint(_currentPathCorner);
 
                 var angle = Mathf.Atan2(localTarget.x, localTarget.z) * Mathf.Rad2Deg;
- 
                 var eulerAngleVelocity  = new Vector3 (0, angle, 0);
                 var deltaRotation  = Quaternion.Euler(eulerAngleVelocity * 5 * Time.deltaTime );
-               
+                
                 transform.rotation *=  deltaRotation;
 
-                if (angle >= -0.5f && angle <= 0.5f && _curremtPAthCornerIndex == _agent.path.corners.Length-1)
+                if (angle >= -0.5f && angle <= 0.5f && CurrentPathCornerIndex == _agent.path.corners.Length-1)
                     _rotating = false;
             }
             
