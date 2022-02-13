@@ -27,6 +27,8 @@ namespace controllers
         private bool _moving = false;
         private bool _rotating = false;
         private bool _isCasting;
+        private Vector3 _currentPathCorner = Vector3.zero;
+        private int _curremtPAthCornerIndex = 1;
         
         [Command]
         void CmdRequestMove(MoveRequest request)
@@ -122,9 +124,11 @@ namespace controllers
  
             if (destination != Vector3.zero && _rotating)
             {
-               
-                var localTarget = transform.InverseTransformPoint(destination);
-     
+
+                _currentPathCorner = _agent.path.corners[_curremtPAthCornerIndex];
+                    
+                var localTarget = transform.InverseTransformPoint(_currentPathCorner);
+
                 var angle = Mathf.Atan2(localTarget.x, localTarget.z) * Mathf.Rad2Deg;
  
                 var eulerAngleVelocity  = new Vector3 (0, angle, 0);
@@ -132,7 +136,7 @@ namespace controllers
                
                 transform.rotation *=  deltaRotation;
 
-                if (angle >= -0.5f && angle <= 0.5f)
+                if (angle >= -0.5f && angle <= 0.5f && _curremtPAthCornerIndex == _agent.path.corners.Length-1)
                     _rotating = false;
             }
             
